@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import render, redirect, reverse, HttpResponse, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.messages import constants
@@ -36,4 +36,30 @@ def novo_evento(request):
 
         evento.save()
         messages.add_message(request, constants.SUCCESS, 'Evento cadastrado com sucesso!')
-        return redirect(reverse('novo_evento'))
+        return redirect('/eventos/gerenciar_evento')
+
+#TODO criar def buscar eventos | copiar gerenciar eventos, mas excluir a linha 49 eventos = Evento.objects.filter(criador=request.user)
+
+@login_required(login_url='/auth/login')
+def gerenciar_evento(request):
+    if request.method == "GET":
+        nome = request.GET.get('nome')
+        eventos = Evento.objects.filter(criador=request.user)
+        if nome:
+            eventos = eventos.filter(nome__contains=nome)
+
+        return render(request, 'gerenciar_evento.html', {'eventos': eventos})
+
+@login_required(login_url='/auth/login')
+def inscrever_evento(request, id):
+    evento = get_object_or_404(Evento, id=id)    
+    if request.method == "GET":
+        return render(request, "inscrever_evento.html", {'evento': evento})
+    elif request.method == "POST":
+        #TODO: validar se o usuaria já está no evento
+        
+        evento.participantes.add(request.user)
+        evento.save()
+
+        messages.add_message(request, constants.SUCCESS, 'Pronto! Sua inscrição já está garantida.')
+        return redirect(reverse('inscrever_evento', kwargs={'id': id}))

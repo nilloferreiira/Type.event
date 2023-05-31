@@ -4,6 +4,7 @@ from django.contrib import auth
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.messages import constants
+import re
 
 def cadastro(request):
     if request.method == "GET":
@@ -17,8 +18,17 @@ def cadastro(request):
     if not (senha == confirmar_senha):
         messages.add_message(request, constants.ERROR, 'As senhas não são iguais')
         return redirect(reverse('cadastro'))
+
+    if len(senha) < 6:
+        messages.add_message(request, constants.ERROR, 'Senha menor que 6 digitos')
+        return redirect(reverse('cadastro'))
     
-    #TODO validar força senha
+    charCheck = re.compile('[\w]+')
+    passwordCheck = re.fullmatch(charCheck, senha)
+    print(passwordCheck)
+    if passwordCheck == None:
+        messages.add_message(request, constants.ERROR, 'Senha precisa conter letras e números!')
+        return redirect(reverse('cadastro'))
 
     user = User.objects.filter(username=username)
 
@@ -47,3 +57,10 @@ def login(request):
 
         auth.login(request, user)
         return redirect('/eventos/novo_evento')
+
+def logout(request):
+    auth.logout(request)
+    messages.add_message(request, constants.WARNING, 'Faça login antes de acessar a plataforma!')
+    return redirect('/auth/login/')
+
+    
