@@ -3,15 +3,15 @@
 
 {% block 'importacoes' %}
     <link href="{% static 'evento/css/gerenciar_evento.css' %}" rel="stylesheet">
+    <link href="{% static 'evento/css/buscar_evento.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block 'conteudo' %}
     <div class="container">
         <br>
         <div class="row">
-            <h3>Meus Eventos:</h3>
             <div class="col-md">
-                <form action="{% url 'gerenciar_evento' %}" method="GET">{% csrf_token %}
+                <form action="{% url 'buscar_evento' %}" method="GET">{% csrf_token %}
                 <label>Título:</label>
                 <input type="text" placeholder="Título..." class="form-control" name="nome">
             </div>
@@ -40,7 +40,11 @@
                 <td>{{evento.descricao}}</td>
                 <td>{{evento.data_inicio}}</td>
                 <td>{{evento.data_termino}}</td>
-                <td><a class="btn btn-success" href="/eventos/participantes_evento/{{evento.id}}/">gerenciar</a></td>
+                {% if request.user in evento.participantes.all %}
+                <td><a class="btn-principal" style="text-decoration: none; border-color: green;" href="/eventos/inscrever_evento/{{evento.id}}/">JÁ ESTÁ PARTICIPANDO!</a></td>
+                {% else %}
+                <td><a class="btn btn-success" href="/eventos/inscrever_evento/{{evento.id}}/" style="width: 200px;">QUERO PARTICIPAR</a></td>
+                {% endif %}
                 <tr><td></td></tr>
             </tr>
         {% endfor %}
