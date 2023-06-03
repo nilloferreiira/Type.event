@@ -37,33 +37,28 @@
         <hr>
 
         <div class="row">
-            <h5>{{evento.participantes.all.count}} Participantes</h5>
-            
-            <div class="col-md-4">
-                <table>
-                    <tr>
-                        <th>Nome</th>
-                        <th>E-mail</th>
-                    </tr>
-                    {% for participante in participantes %}
-                        <tr class="{% cycle 'linha' 'linha2' %}">
-                            <td>{{participante.username}}</td>
-                            <td>{{participante.email}}</td>
-                        </tr>
-                    {% endfor %}       
-                </table>
-                <br>
-                <div class="row">
 
-                    <div class="col-md ">
-                        <a href="{% url 'gerar_csv' evento.id %}" class="btn-principal" style="text-decoration: none;">Exportar CSV</a>
-                    </div>
-                </div>
-            </div>
-        
+            {% if qtd_certificados >= 0 %}
+            <h5>{{qtd_certificados}} Certificados para serem gerados</h5>
+            {% else %}
+            <h5>Nenhum certificado para ser gerado</h5>
+            {% endif %}
+                {% if qtd_certificados > 0 %}
+                    <a href="{% url 'gerar_certificado' evento.id %}" class="btn-principal link" style="width: 22%; margin: 5px 0 5px 10px;">GERAR TODOS OS CERTIFICADOS</a>
+                {% endif %}
+                
         </div>
-        
-        
+        <hr>
+
+        <div class="row">
+            <h5>Procurar certificado</h5>
+            <br>
+            <form action="{% url 'procurar_certificado' evento.id %}" method="POST" target="_blank">
+                <input type="email" class="form-control" placeholder="Digite o e-mail" name="email" style="width: 40%;">{% csrf_token %}
+                <br>
+                <input type="submit" value="BUSCAR" class="btn btn-primary">
+            </form>
+        </div>
     </div>
 
 {% endblock %}
